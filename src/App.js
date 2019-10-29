@@ -1,23 +1,20 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import MultipleSelect from './components/multiple-select';
+const {Option} = MultipleSelect
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <MultipleSelect>
+          <Option value="111">北京</Option>
+          <Option value="121">北京r4</Option>
+          <Option value="111=3">北京66</Option>
+        </MultipleSelect>
       </header>
     </div>
   );
