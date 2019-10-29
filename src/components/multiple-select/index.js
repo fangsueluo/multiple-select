@@ -1,7 +1,6 @@
-import React, {Component, Fragment} from 'react'
+import React, {Component, Children} from 'react'
 // import PropTypes from 'prop-types'
-import Option from './Option'
-import Select from './Select'
+import './style.scss'
 
 export default class MultipleSelect extends Component {
   // 默认参数
@@ -11,16 +10,63 @@ export default class MultipleSelect extends Component {
       defaultValue: '',
       maxTagCount: 8,
       mode:'',
-      onSearch: ()=>{}
+      onSearch: ()=>{},
+      onChange: ()=>{}
     }
+  cell = ''
+  showOption = false
+  selectedText = ''
+
+  componentDidMount() {
+    document.addEventListener('click', (e) => {
+      if (this.cell && this.cell !== e.target && !this.cell.contains(e.target)) {
+        this.showOption = false;
+      }
+      }, true);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('nexgs',nextProps)
+    if (nextProps.value !== this.props.value || nextProps.children !== this.props.children) {
+      // React.Children.map(this.props.children, (child, index) => {
+      //  if (nextProps.value === child.props.value) {
+      //   this.selectedText = child.props.children;
+      //  }
+      // });
+     }
+  }
 
   render() {
-    const {placeholder, children} = this.props
+    const {placeholder, children,onChange} = this.props
     return (
-      <Fragment>
-        <Select placeholder={placeholder}></Select>
+      <div className="multiple-select">
+        <div className="select-wrap">
+          <div className="title">{placeholder}</div>
+          <input className="input"/>
+        </div>
+        <div className="options-wrap">
+          {
+            Children.map(children, (child, index) => {
+              return (
+                <div onClick={onChange}> 
+                  {child}
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
+    )
+  }
+}
+
+class Option extends Component{
+  render() {
+    const {children} = this.props
+    return (
+      <div>
         {children}
-      </Fragment>
+      </div>
     )
   }
 }
