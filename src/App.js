@@ -7,6 +7,52 @@ export default class App extends Component {
   changeSelect(val){
     console.log(val)
   }
+  options = [
+    {
+      label: '选项1',
+      tagName: 'tag选项1',
+      value: 1
+    },
+    {
+      label: '选项2',
+      tagName: 'tag选项2',
+      value: 2
+    },
+    {
+      label: '选项3',
+      tagName: 'tag选项3',
+      value: 3
+    },
+    {
+      label: '选项4',
+      tagName: 'tag选项4',
+      value: 4
+    },
+    {
+      label: '选项5',
+      tagName: 'tag选项5',
+      value: 5
+    },
+    {
+      label: '选项6',
+      tagName: 'tag选项6',
+      value: 6
+    },{
+      label: '选项7',
+      tagName: 'tag选项7',
+      value: 7
+    },
+    {
+      label: '选项8',
+      tagName: 'tag选项8',
+      value: 8
+    },
+    {
+      label: '选项9',
+      tagName: 'tag选项9',
+      value: 9
+    }
+  ]
   render() {
     return (
       <div className="App">
@@ -14,6 +60,13 @@ export default class App extends Component {
           <Option value="111">北京</Option>
           <Option value="121">北京r4</Option>
           <Option value="111=3">北京66</Option>
+        </MultipleSelect>
+        <MultipleSelect className="top">
+          {
+            this.options.map(item => {
+              return <Option value={item.value} key={item.value}>{item.label}</Option>
+            })
+          }
         </MultipleSelect>
       </div>
     );
