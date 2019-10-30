@@ -61,13 +61,16 @@ export default class App extends Component {
           <Option value="121">北京r4</Option>
           <Option value="111=3">北京66</Option>
         </MultipleSelect>
-        <MultipleSelect className="top">
+        {/* <MultipleSelect 
+        className="top"
+        tagLabelProp="tagName"
+        >
           {
             this.options.map(item => {
-              return <Option value={item.value} key={item.value}>{item.label}</Option>
+              return <Option value={item.value} tagName={item.tagName} key={item.value}>{item.label}</Option>
             })
           }
-        </MultipleSelect>
+        </MultipleSelect> */}
       </div>
     );
   }

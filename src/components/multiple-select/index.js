@@ -1,6 +1,7 @@
-import React, {Component, Children} from 'react'
+import React, {Component, Children, cloneElement, Fragment} from 'react'
 // import PropTypes from 'prop-types'
 import './style.scss'
+import Option from './Option'
 
 export default class MultipleSelect extends Component {
   // 默认参数
@@ -9,7 +10,7 @@ export default class MultipleSelect extends Component {
       allowClear: false,
       defaultValue: '',
       maxTagCount: 8,
-      tagField: '',
+      tagLabelProp: '',
       mode:'',
       onSearch: ()=>{},
       onChange: ()=>{}
@@ -19,7 +20,8 @@ export default class MultipleSelect extends Component {
   state = {
     showOption : false,
     selectedText : '',
-    tagArr: []
+    tagArr: [],
+    tagMapsClone: {}
   }
 
   componentDidMount() {
@@ -41,7 +43,7 @@ export default class MultipleSelect extends Component {
     this.setState({
       selectedText: child.children,
       value: child.value,
-      showOption: false
+      // showOption: false
     })
     this.unitTags(child)
   }
@@ -50,19 +52,21 @@ export default class MultipleSelect extends Component {
     const {tagArr} = this.state
     const field = this.getTagField()
     const item = this.tagMaps[tag[field]]
-    debugger
     if(item) {
       tagArr.splice(item.index, 1)
       this.setState({
         tagArr: [...tagArr]
+      }, () => {
+        delete this.tagMaps[tag[field]]
+        this.setTagMaps()
       });
-      delete this.tagMaps[tag[field]]
     } else {
       this.setState({
         tagArr: [...tagArr, tag]
+      }, () => {
+        this.setTagMaps()
       })
     }
-    this.setTagMaps()
   }
 
   setTagMaps = () => {
@@ -77,6 +81,9 @@ export default class MultipleSelect extends Component {
       }
     }
     this.tagMaps = map
+    this.setState({
+      tagMapsClone: {...this.tagMaps}
+    })
   }
 
   handlePopOptions = () => {
@@ -89,24 +96,34 @@ export default class MultipleSelect extends Component {
     this.selectRef = el
   }
 
+  setInputRef = (el) => {
+    this.InputRef = el
+  }
+
   renderOptions(props) {
     const {children} = props
+    const {tagMapsClone} = this.state
+    const field = this.getTagField()
     return Children.map(children, (child, index) => {
-      console.log('childe', child)
-      // tagField
-      return (
-        <div onClick={()=> this.handleChangeOption(child.props)} className="option"> 
-          {child}
-        </div>
-      )
+      const { props }=child
+      const active = tagMapsClone[props[field]] ? true : false
+      return cloneElement(child, {
+        active,
+        value: props,
+        clickItem: this.handleChangeOption
+      })
     })
   }
 
+  highlightOption = (option) => {
+    
+  }
+
   getTagField = () => {
-    const {tagField} = this.props
+    const {tagLabelProp} = this.props
     let field = 'children'
-    if(tagField) {
-      field = tagField
+    if(tagLabelProp) {
+      field = tagLabelProp
     }
 
     return field
@@ -121,10 +138,11 @@ export default class MultipleSelect extends Component {
     for(let i = 0; i < len; i++) {
       const item = tagArr[i]
       let itemJSX = ''
-      if(i >= maxTagCount -1) {
+      if(i > maxTagCount -1) {
         itemJSX = (
-          <div>+{len-i}</div>
+          <div key={item.value}>+{len-i}</div>
         )
+        tagItems.push(itemJSX)
         break;
       }
       itemJSX = (
@@ -135,17 +153,36 @@ export default class MultipleSelect extends Component {
       )
       tagItems.push(itemJSX)
     }
-    return <div className="tags-wrap">{tagItems}</div>
+    return tagItems
+  }
+
+  renderSelect = () => {
+    const {placeholder} = this.props
+    const {tagArr} = this.state
+    if(tagArr && tagArr.length) {
+      return (
+        <div className="tags-wrap">
+          {this.renderTags()}
+          <input className="input" ref={this.setInputRef}/>
+        </div>
+      )
+    } else {
+      return (
+        <Fragment>
+          <div className="title">{placeholder}</div>
+          <input className="input" ref={this.setInputRef}/>
+        </Fragment>
+      ) 
+    }
+
   }
 
   render() {
-    const {placeholder} = this.props
-    const {selectedText,showOption, tagArr} = this.state
+    const {showOption} = this.state
     return (
       <div className="multiple-select" ref={this.setSelectRef}>
         <div className="select-wrap" onClick={this.handlePopOptions}>
-          {tagArr && tagArr.length ? this.renderTags(): <div className="title">{placeholder}</div>}
-          <input className="input"/>
+          {this.renderSelect()}
         </div>
         <div className={showOption ? 'options-wrap show':'options-wrap'}>
           {this.renderOptions(this.props)}
@@ -155,16 +192,7 @@ export default class MultipleSelect extends Component {
   }
 }
 
-class Option extends Component{
-  render() {
-    const {children} = this.props
-    return (
-      <div>
-        {children}
-      </div>
-    )
-  }
-}
+
 
 MultipleSelect.Option = Option
 
