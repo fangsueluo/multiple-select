@@ -5,6 +5,9 @@
   outline:none;
   border:none;
 }
+html,body{
+  height: 100%;
+}
 
 .top{
   margin-top: 30px;

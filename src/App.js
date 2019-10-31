@@ -66,14 +66,62 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
+        <div>默认</div>
         <MultipleSelect onChange={this.changeSelect}>
           <Option value="111">北京</Option>
           <Option value="121">北京r4</Option>
           <Option value="111=3">北京66</Option>
         </MultipleSelect>
+
+        <div className="top">可搜索</div>
         <MultipleSelect 
-        className="top"
+        className={"top"}
+        search
+        width="400"
+        onChange={this.changeSelect}
+        >
+          {
+            this.options.map(item => {
+              return <Option value={item.value} key={item.value}>{item.label}</Option>
+            })
+          }
+        </MultipleSelect>
+
+        <div className="top">可搜索,标签名和选项名不同：</div>
+        <MultipleSelect 
+        className={"top"}
         tagLabelProp="tagName"
+        search
+        onChange={this.changeSelect}
+        >
+          {
+            this.options.map(item => {
+              return <Option value={item.value} tagName={item.tagName} key={item.value}>{item.label}</Option>
+            })
+          }
+        </MultipleSelect>
+
+        <div className="top">可搜索、可添加：</div>
+        <MultipleSelect 
+        className={"top"}
+        tagLabelProp="tagName"
+        search
+        addOption
+        onChange={this.changeSelect}
+        >
+          {
+            this.options.map(item => {
+              return <Option value={item.value} tagName={item.tagName} key={item.value}>{item.label}</Option>
+            })
+          }
+        </MultipleSelect>
+
+        <div className="top">option显示上方：</div>
+        <MultipleSelect 
+        className={"top"}
+        tagLabelProp="tagName"
+        search
+        addOption
         onChange={this.changeSelect}
         >
           {

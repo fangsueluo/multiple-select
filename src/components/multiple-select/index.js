@@ -2,30 +2,35 @@ import React, {Component, Children, cloneElement, Fragment} from 'react'
 import PropTypes from 'prop-types'
 import './style.scss'
 import Option from './Option'
+import Portal from './Portal'
 
 export default class MultipleSelect extends Component {
   // 默认参数
   static defaultProps = {
       placeholder: '请选择',
+      width: '',
       allowClear: true, //允许一次性删除
-      defaultValue: '',
       maxTagCount: 8,  //最大tag展示
       tagLabelProp: '', //tag显示的属性名
       search: false, //搜索选项
       addOption: false, // 搜索添加选项,
-      onChange: () => {} //点击选项时触发
+      onChange: () => {}, //点击选项时触发
+      getPopupContainer: () => document.body //菜单渲染父节点, 默认渲染到 body
     }
   static propTypes = {
     onChange: PropTypes.func,
+    getPopupContainer: PropTypes.func,
     maxTagCount: PropTypes.number,
     tagLabelProp: PropTypes.string,
-    allowClear: PropTypes.bool
+    allowClear: PropTypes.bool,
+    width: PropTypes.string
   }
 
   selectRef = null
+  InputRef = null
+  portalRef = null
   tagMaps = {}
   optionsMap = {}
-  InputRef = null
 
   state = {
     showOption : false,
@@ -36,16 +41,22 @@ export default class MultipleSelect extends Component {
   }
 
   componentDidMount() {
+    this.setOptionsMap()
     document.addEventListener('click', (e) => {
-        const {selectRef} = this
-        if (selectRef && selectRef !== e.target && !selectRef.contains(e.target)) {
-          this.setState({
-            showOption: false,
-            inputValue: ''
-          })
+      const {selectRef} = this
+      let {portalRef} = this
+      portalRef = document.querySelector('.options-wrap')
+      const flag = (portalRef && !portalRef.contains(e.target)) ^ (selectRef && !selectRef.contains(e.target))
+      if (!flag) {
+        this.setState({
+          showOption: false,
+          inputValue: ''
+        })
+        if(portalRef) {
+          portalRef.className = 'options-wrap'
         }
-      }, true);
-      this.setOptionsMap()
+      }
+    }, true);
   }
 
   handleChangeOption = (tag) => {
@@ -161,6 +172,7 @@ export default class MultipleSelect extends Component {
       }
     }
     return Children.map(children, (child, index) => {
+      // return child
       const { props } = child
       const active = tagMapsClone[props[field]] ? true : false
       return cloneElement(child, {
@@ -198,10 +210,6 @@ export default class MultipleSelect extends Component {
     this.optionsMap = map
   }
 
-  highlightOption = (option) => {
-    
-  }
-  //
   getTagField = () => {
     const {tagLabelProp} = this.props
     let field = 'children'
@@ -306,21 +314,28 @@ export default class MultipleSelect extends Component {
 
   render() {
     const {showOption} = this.state
+    const {className, getPopupContainer, width} = this.props
+    const _className = className ? className + ' multiple-select' : 'multiple-select'
+    const portalClassName = showOption ? 'show' : ''
     return (
-      <div className="multiple-select" ref={this.setSelectRef}>
-        <div className={this.selectClickStyle()} onClick={this.handlePopOptions}>
-          {this.renderSelect()}
-          <div className="down">▼</div>
-          {this.isShowAllDel() ? <div className="del" onClick={this.deleteTags}>×</div> : ''}
+        <div className={_className}>
+          <div className={this.selectClickStyle()} style={{width: width+'px'}} ref={this.setSelectRef} onClick={this.handlePopOptions}>
+            {this.renderSelect()}
+            <div className="down">▼</div>
+            {this.isShowAllDel() ? <div className="del" onClick={this.deleteTags}>×</div> : ''}
+          </div>
+          {
+            showOption ? <Portal
+              getPopupContainer={getPopupContainer} 
+              targetRef={this.selectRef}
+              className={portalClassName}>
+              {this.renderOptions()}
+            </Portal> : null
+          }
         </div>
-        <div className={showOption ? 'options-wrap show':'options-wrap'}>
-          {this.renderOptions()}
-        </div>
-      </div>
+      
     )
   }
 }
-
-
 
 MultipleSelect.Option = Option
