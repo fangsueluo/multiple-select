@@ -51,6 +51,16 @@ export default class App extends Component {
       label: '选项9',
       tagName: 'tag选项9',
       value: 9
+    },
+    {
+      label: '选项10',
+      tagName: 'tag选项10',
+      value: 10
+    },
+    {
+      label: '选项11',
+      tagName: 'tag选项11',
+      value: 11
     }
   ]
   render() {
@@ -61,16 +71,17 @@ export default class App extends Component {
           <Option value="121">北京r4</Option>
           <Option value="111=3">北京66</Option>
         </MultipleSelect>
-        {/* <MultipleSelect 
+        <MultipleSelect 
         className="top"
         tagLabelProp="tagName"
+        onChange={this.changeSelect}
         >
           {
             this.options.map(item => {
               return <Option value={item.value} tagName={item.tagName} key={item.value}>{item.label}</Option>
             })
           }
-        </MultipleSelect> */}
+        </MultipleSelect>
       </div>
     );
   }
